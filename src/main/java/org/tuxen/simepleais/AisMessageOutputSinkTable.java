@@ -37,6 +37,10 @@ import dk.dma.enav.util.function.Consumer;
 public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	private final PrintWriter fos;
 	private ConcurrentHashMap<Integer, AisTarget> reports;
+    private final SimpleDateFormat filenameFormatter = new SimpleDateFormat(
+            "YYYY-MM-dd-HH:mm:ssZ".replace(" ", "_").replace(":","_"));
+    private final SimpleDateFormat dirNameFormatter = new SimpleDateFormat("YYYY-MM-dd");
+
 
 	/**
 	 * Create an CSV/TSV table output sink with a lookup table
@@ -46,18 +50,15 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	 *            to this table.
 	 * @throws IOException
 	 */
-	public AisMessageOutputSinkTable(
-			ConcurrentHashMap<Integer, AisTarget> reports) throws IOException {
-		SimpleDateFormat filenameFormatter = new SimpleDateFormat(
-				"YYYY-MM-dd-HH:mm:ssZ");
-		SimpleDateFormat dirNameFormatter = new SimpleDateFormat("YYYY-MM-dd");
-		new File(dirNameFormatter.format(new Date())).mkdirs();
-		
-		File f = new File(dirNameFormatter.format(new Date()) + "/"
-				+ filenameFormatter.format(new Date()) + ".tsv");
-		fos = new PrintWriter(new BufferedWriter(new FileWriter(f)));
-		this.reports = reports;
-	}
+    public AisMessageOutputSinkTable(
+            ConcurrentHashMap<Integer, AisTarget> reports) throws IOException {
+        new File(dirNameFormatter.format(new Date())).mkdirs();
+        
+        File f = new File(dirNameFormatter.format(new Date()) + "/"
+                + filenameFormatter.format(new Date()) + ".tsv");
+        fos = new PrintWriter(new BufferedWriter(new FileWriter(f)));
+        this.reports = reports;
+    }
 
 	public ConcurrentHashMap<Integer, AisTarget> getReports() {
 		return reports;
@@ -95,6 +96,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 		AisTarget aisTarget = null;
 
 		line.put("time stamp", aisPacket.getBestTimestamp());
+		line.put("time", filenameFormatter.format(new Date(aisPacket.getBestTimestamp())));
 		line.put("mmsi", aisMessage.getUserId());
 
 		// Handle static reports for both class A and B vessels (msg 5 + 24)
@@ -135,7 +137,6 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			line.put("lat", posMessage.getPos().getLatitudeDouble());
 			line.put("long", posMessage.getPos().getLongitudeDouble());
 			line.put("heading", posMessage.getTrueHeading());
-			line.put("time", posMessage.getUtcSec());
 		}
 
 		if (aisTarget == null) {

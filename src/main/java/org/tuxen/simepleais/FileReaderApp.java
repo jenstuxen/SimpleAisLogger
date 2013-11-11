@@ -10,7 +10,7 @@ import dk.dma.ais.reader.AisReaders;
  * @author Jens Tuxen
  * 
  */
-public class App {
+public class FileReaderApp {
 	public static void main(String[] args) throws FileNotFoundException {
 		// run indefinitely
 		for (;;) {
