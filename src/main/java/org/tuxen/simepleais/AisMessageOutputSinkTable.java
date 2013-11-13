@@ -13,6 +13,7 @@ import dk.dma.ais.binary.SixbitException;
 import dk.dma.ais.data.AisClassAStatic;
 import dk.dma.ais.data.AisClassBStatic;
 import dk.dma.ais.data.AisTarget;
+import dk.dma.ais.data.AisTargetDimensions;
 import dk.dma.ais.data.AisVesselStatic;
 import dk.dma.ais.data.AisVesselTarget;
 import dk.dma.ais.message.AisMessage;
@@ -38,8 +39,10 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	private final PrintWriter fos;
 	private ConcurrentHashMap<Integer, AisTarget> reports;
     private final SimpleDateFormat filenameFormatter = new SimpleDateFormat(
-            "YYYY-MM-dd-HH:mm:ssZ".replace(" ", "_").replace(":","_ "));
+            "YYYY-MM-dd-HH:mm:ssZ".replace(" ", "_").replace(":","_"));
     private final SimpleDateFormat dirNameFormatter = new SimpleDateFormat("YYYY-MM-dd");
+    
+    private final SimpleDateFormat timestampFormat = new SimpleDateFormat("YYYY-MM-dd-HH:mm:ssZ");
 
 
 	/**
@@ -71,12 +74,21 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	public AisMessageOutputSinkTable() throws IOException {
 		this(new ConcurrentHashMap<Integer, AisTarget>());
 	}
-
-	/**
-	 * 
-	 */
+	
+	
 	@Override
 	public void accept(AisPacket aisPacket) {
+		try {
+			this.process(aisPacket);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
+	 * try to process, or continue otherwise
+	 */
+	public void process(AisPacket aisPacket) {
 		//throw out packets that have bad  or bad messages
 		AisMessage aisMessage;
 		try {
@@ -95,7 +107,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 		AisDataMap line = new AisDataMap();
 		AisTarget aisTarget = null;
 
-		line.put("time stamp", aisPacket.getBestTimestamp());
+		line.put("time stamp", aisPacket.getBestTimestamp()/1000);
 		line.put("time", filenameFormatter.format(new Date(aisPacket.getBestTimestamp())));
 		line.put("mmsi", aisMessage.getUserId());
 
@@ -119,7 +131,9 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 		// parent
 		if (aisMessage instanceof AisPositionMessage) {
 			AisPositionMessage posMessage = (AisPositionMessage) aisMessage;
-
+			
+			line.put("rot", posMessage.getRot());
+			
 			line.put("nav status",
 					NavigationalStatus.get(posMessage.getNavStatus())
 							.toString());
@@ -131,9 +145,15 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			line.put("sog", posMessage.getSog());
 
 			Position pos = posMessage.getPos().getGeoLocation();
-
-			line.put("latitude", pos.getLatitudeAsString());
-			line.put("longitude", pos.getLongitudeAsString());
+			
+			try {
+				line.put("latitude", pos.getLatitude());
+				line.put("longitude", pos.getLongitude());
+			} catch (Exception e) {
+				
+			}
+			
+			
 			line.put("lat", posMessage.getPos().getLatitudeDouble());
 			line.put("long", posMessage.getPos().getLongitudeDouble());
 			line.put("heading", posMessage.getTrueHeading());
@@ -153,16 +173,29 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			ShipTypeCargo stc = new ShipTypeCargo(avs.getShipType());
 			line.put("ship type", stc.getShipType().toString());
 			line.put("cargo", stc.getShipCargo().toString());
-			line.put("length", Math.max(avs.getDimensions().getDimStarboard(),
-					avs.getDimensions().getDimStern()));
-			line.put("breath", Math.max(avs.getDimensions().getDimPort(), avs
-					.getDimensions().getDimBow()));
-
+			
+			AisTargetDimensions dims = avs.getDimensions();
+			
+			line.put("starboard",0);
+			line.put("port",0);
+			line.put("stern",0);
+			line.put("bow",0);
+			
 			if (avs instanceof AisClassBStatic) {
 			} else if (avs instanceof AisClassAStatic) {
 				AisClassAStatic acas = (AisClassAStatic) avs;
-				line.put("imo number", acas.getImoNo());
-				line.put("maximum actual draught", acas.getDraught());
+				try {
+					line.put("imo number", acas.getImoNo());
+				} catch (NullPointerException e) {
+					line.put("imo number", "NULL");
+				}
+				
+				try {
+					line.put("maximum actual draught", acas.getDraught());
+				} catch (NullPointerException e) {
+					line.put("maximum actual draught", "NULL");
+				}
+				
 				line.put("destination", acas.getDestination());
 			}
 		}

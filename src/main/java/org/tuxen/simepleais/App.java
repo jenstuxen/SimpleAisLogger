@@ -1,6 +1,7 @@
 package org.tuxen.simepleais;
 
 import java.io.FileNotFoundException;
+import java.util.concurrent.TimeUnit;
 
 import dk.dma.ais.reader.AisReader;
 import dk.dma.ais.reader.AisReaders;
@@ -24,6 +25,7 @@ public class App {
 				}
 
 				RollingOutputSink sink = new RollingOutputSink();
+				//RollingOutputSink sink = new RollingOutputSink(2,TimeUnit.MINUTES);
 				reader.registerPacketHandler(sink);
 				reader.start();
 

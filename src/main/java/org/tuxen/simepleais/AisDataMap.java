@@ -11,9 +11,13 @@ public class AisDataMap extends LinkedHashMap<String, String> {
 
 	private static final long serialVersionUID = 1L;
 
-	final static String keys = "MMSI,Ship name,Call sign,imo number,Ship type,destination,Length,Breadth,maximum actual draught,cargo,Latitude,Longitude,Time stamp,SOG,COG,heading,nav status,Long,Lat,Time"
+	//final static String keys = "MMSI,Ship name,Call sign,imo number,Ship type,destination,Length,Breadth,maximum actual draught,cargo,Latitude,Longitude,Time stamp,SOG,COG,heading,nav status,Long,Lat,Time"
+	//		.toLowerCase();
+
+	final static String keys = "MMSI,Ship name,Call sign,imo number,Ship type,destination,maximum actual draught,cargo,Latitude,Longitude,Time stamp,SOG,COG,heading,nav status,Long,Lat,Time,starboard,port,stern,bow"
 			.toLowerCase();
 
+	
 	public AisDataMap() {
 		super(keys.split(",").length);
 		for (String k : keys.split(",")) {
