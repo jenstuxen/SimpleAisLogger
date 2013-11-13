@@ -38,7 +38,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	private final PrintWriter fos;
 	private ConcurrentHashMap<Integer, AisTarget> reports;
     private final SimpleDateFormat filenameFormatter = new SimpleDateFormat(
-            "YYYY-MM-dd-HH:mm:ssZ".replace(" ", "_").replace(":","_"));
+            "YYYY-MM-dd-HH:mm:ssZ".replace(" ", "_").replace(":","_ "));
     private final SimpleDateFormat dirNameFormatter = new SimpleDateFormat("YYYY-MM-dd");
 
 
