@@ -187,13 +187,13 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 				try {
 					line.put("imo number", acas.getImoNo());
 				} catch (NullPointerException e) {
-					line.put("imo number", "NULL");
+					line.put("imo number", "");
 				}
 				
 				try {
 					line.put("maximum actual draught", acas.getDraught());
 				} catch (NullPointerException e) {
-					line.put("maximum actual draught", "NULL");
+					line.put("maximum actual draught", "");
 				}
 				
 				line.put("destination", acas.getDestination());

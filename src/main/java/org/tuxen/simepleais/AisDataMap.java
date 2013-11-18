@@ -21,7 +21,7 @@ public class AisDataMap extends LinkedHashMap<String, String> {
 	public AisDataMap() {
 		super(keys.split(",").length);
 		for (String k : keys.split(",")) {
-			this.put(k.toLowerCase(), "NULL");
+			this.put(k.toLowerCase(), "");
 		}
 	}
 
