@@ -180,13 +180,19 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			
 			AisTargetDimensions dims = avs.getDimensions();
 			
+			try {
+				line.put("starboard",(new Byte(dims.getDimStarboard())).intValue());
+				line.put("port",(new Short(dims.getDimPort())).intValue());
+				line.put("stern",(new Short(dims.getDimStern())).intValue());
+				line.put("bow",(new Short(dims.getDimBow())).intValue());				
+			} catch (NullPointerException e) {
+				LOG.error("Failed to set dimensions cause of: "+e.getMessage());
+				e.printStackTrace();
+			}
 
-			line.put("starboard",(new Byte(dims.getDimStarboard())).intValue());
-			line.put("port",(new Short(dims.getDimPort())).intValue());
-			line.put("stern",(new Short(dims.getDimStern())).intValue());
-			line.put("bow",(new Short(dims.getDimBow())).intValue());
 			
 			if (avs instanceof AisClassBStatic) {
+				AisClassBStatic acbs = (AisClassBStatic) avs;
 			} else if (avs instanceof AisClassAStatic) {
 				AisClassAStatic acas = (AisClassAStatic) avs;
 				try {
@@ -194,7 +200,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 				} catch (NullPointerException e) {
 					line.put("imo number", "");
 				}
-				
+
 				try {
 					line.put("maximum actual draught", acas.getDraught());
 				} catch (NullPointerException e) {
@@ -211,7 +217,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 
 		long end = System.currentTimeMillis();
 
-		if (end - start > 10) {
+		if (end - start > 50) {
 			LOG.info("Time to process: " + (end - start));
 		}
 
