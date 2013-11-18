@@ -9,6 +9,9 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import dk.dma.ais.binary.SixbitException;
 import dk.dma.ais.data.AisClassAStatic;
 import dk.dma.ais.data.AisClassBStatic;
@@ -36,6 +39,7 @@ import dk.dma.enav.util.function.Consumer;
  * 
  */
 public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
+	private Logger LOG = LoggerFactory.getLogger(AisMessageOutputSinkTable.class);
 	private final PrintWriter fos;
 	private ConcurrentHashMap<Integer, AisTarget> reports;
     private final SimpleDateFormat filenameFormatter = new SimpleDateFormat(
@@ -176,10 +180,11 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			
 			AisTargetDimensions dims = avs.getDimensions();
 			
-			line.put("starboard",0);
-			line.put("port",0);
-			line.put("stern",0);
-			line.put("bow",0);
+
+			line.put("starboard",(new Byte(dims.getDimStarboard())).intValue());
+			line.put("port",(new Short(dims.getDimPort())).intValue());
+			line.put("stern",(new Short(dims.getDimStern())).intValue());
+			line.put("bow",(new Short(dims.getDimBow())).intValue());
 			
 			if (avs instanceof AisClassBStatic) {
 			} else if (avs instanceof AisClassAStatic) {
@@ -207,7 +212,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 		long end = System.currentTimeMillis();
 
 		if (end - start > 10) {
-			System.out.println("Time to process: " + (end - start));
+			LOG.info("Time to process: " + (end - start));
 		}
 
 	}
