@@ -98,7 +98,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 		try {
 			aisMessage = aisPacket.getAisMessage();
 		} catch (AisMessageException | SixbitException e) {
-			e.printStackTrace();
+			//e.printStackTrace();
 			return;
 		}
 		
@@ -127,9 +127,10 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 
 		// Handle AtoN message
 		if (aisMessage instanceof AisMessage21) {
-			// AisMessage21 msg21 = (AisMessage21) aisMessage;
+			//AisMessage21 msg21 = (AisMessage21) aisMessage;
 			// break;
 			// System.out.println("AtoN name: " + msg21.getName());
+		    
 		}
 		// Handle position messages 1,2 and 3 (class A) by using their shared
 		// parent
@@ -153,13 +154,12 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 			try {
 				line.put("latitude", pos.getLatitude());
 				line.put("longitude", pos.getLongitude());
+				line.put("lat", posMessage.getPos().getLatitudeDouble());
+	            line.put("long", posMessage.getPos().getLongitudeDouble());
 			} catch (Exception e) {
 				
 			}
-			
-			
-			line.put("lat", posMessage.getPos().getLatitudeDouble());
-			line.put("long", posMessage.getPos().getLongitudeDouble());
+
 			line.put("heading", posMessage.getTrueHeading());
 		}
 
