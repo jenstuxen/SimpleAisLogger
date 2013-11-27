@@ -1,11 +1,18 @@
 package org.tuxen.simepleais;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.concurrent.ConcurrentHashMap;
 
 import dk.dma.ais.data.AisTarget;
+import dk.dma.ais.packet.AisPacket;
+import dk.dma.ais.packet.AisPacketOutputSinks;
 import dk.dma.ais.reader.AisReader;
 import dk.dma.ais.reader.AisReaders;
+import dk.dma.commons.util.io.OutputStreamSink;
+import dk.dma.enav.util.function.Consumer;
 
 /**
  * 
@@ -37,7 +44,6 @@ public class FileReaderApp {
                 sink.die();
             }
             
-            System.out.println("ships seen:" +reports.keySet().size());
 
         } catch (Exception e) {
             e.printStackTrace();
