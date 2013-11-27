@@ -38,7 +38,7 @@ import dk.dma.enav.util.function.Consumer;
  * @author Jens Tuxen
  * 
  */
-public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
+public class AisMessageOutputSinkTable extends PacketsPerSecondConsumer implements Consumer<AisPacket> {
 	private Logger LOG = LoggerFactory.getLogger(AisMessageOutputSinkTable.class);
 	private final PrintWriter fos;
 	private ConcurrentHashMap<Integer, AisTarget> reports;
@@ -84,6 +84,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 	public void accept(AisPacket aisPacket) {
 		try {
 			this.process(aisPacket);
+			super.accept(aisPacket);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -186,8 +187,7 @@ public class AisMessageOutputSinkTable implements Consumer<AisPacket> {
 				line.put("stern",(new Short(dims.getDimStern())).intValue());
 				line.put("bow",(new Short(dims.getDimBow())).intValue());				
 			} catch (NullPointerException e) {
-				LOG.error("Failed to set dimensions cause of: "+e.getMessage());
-				e.printStackTrace();
+				//LOG.error("Failed to set dimensions cause of: "+e.getMessage());
 			}
 
 			
